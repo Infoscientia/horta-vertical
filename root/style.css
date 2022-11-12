@@ -1,0 +1,235 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@300;400;700&display=swap");
+* {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 3em;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+body,
+html {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font: 32px "Inter", sans-serif;
+  line-height: 1.6;
+  color: #0f3561;
+}
+
+.app {
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: grid;
+  position: relative;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 100%;
+  grid-template-areas: "appbar" "content" "tabbar";
+  background-color: #87ba7b;
+}
+
+.appbar {
+  display: grid;
+  grid-area: appbar;
+  grid-template-areas: "controls-left title controls-right";
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+}
+.appbar__controls-left {
+  grid-area: controls-left;
+}
+.appbar__title {
+  grid-area: title;
+}
+.appbar__title-text {
+  font-size: 1.2em;
+}
+.appbar__title-text-p {
+  margin-top: -30px;
+}
+.appbar__controls-right {
+  grid-area: controls-right;
+}
+
+.appbar__controls-right-span {
+  font-size: 62px;
+}
+.appbar--hero {
+  padding: 56px 24px;
+  background-color: #87ba7b;
+  grid-template-areas: "title title controls-right";
+}
+.appbar--hero .appbar__title-text {
+  font-size: 3em;
+}
+
+.content {
+  grid-area: content;
+  height: 100%;
+  padding: 32px 24px;
+  background-color: #ffffff;
+}
+
+.scrollview {
+  overflow: auto;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollview::-webkit-scrollbar {
+  width: 0px;
+}
+
+.backdrop {
+  border-radius: 24px;
+}
+
+.list__item {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 0 24px;
+  border-bottom: 1px solid #c3cdd8;
+}
+.list__item:last-child {
+  border: none;
+}
+.list__item-footer {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+}
+.list__title {
+  margin-bottom: 16px;
+}
+
+.button {
+  border: none;
+  display: flex;
+  gap: 8px;
+  background-color: #5d8b72;
+  padding: 16px 24px;
+  font-weight: 500;
+  font-size: 1em;
+  border-radius: 24px;
+  color: #ffffff;
+  transition: ease-in 0.12s;
+}
+.button:active {
+  background-color: #517e6f;
+}
+.button--secondary {
+  color: #0f3561;
+  background-color: #c3cdd8;
+}
+.button--secondary:active {
+  background-color: #abb8c8;
+}
+.button--tertiary {
+  color: #0f3561;
+  background-color: #e2e7ec;
+}
+.button--tertiary:active {
+  background-color: #cfd7df;
+}
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 52px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 16px 64px;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  background-color: #87ba7b;
+  margin-bottom: 30px;
+}
+.navigation__item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px 24px;
+  border-radius: 24px;
+  font-size: 54px;
+}
+.navigation--item-current {
+  background-color: #5d8b72;
+  font-weight: 700;
+  color: #ffffff;
+  width: 100%;
+}
+
+.status {
+  display: flex;
+  gap: 5px;
+  align-items: baseline;
+}
+.status-umidade {
+  font-size: 55px;
+  font-weight: 600;
+}
+.status-label {
+  font-size: 26px;
+}
+.progress {
+  margin: 0 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.toggle-btn {
+  width: 240px;
+  height: 120px;
+  background: gray;
+  border-radius: 50px;
+  padding: 1px;
+  transition: all 300ms ease-in-out;
+}
+.toggle-btn > .inner-circle {
+  width: 120px;
+  height: 120px;
+  background: white;
+  border-radius: 50%;
+  transition: all 300ms ease-in-out;
+}
+.toggle-btn.active {
+  background: #5d8b72;
+  box-shadow: 0 0 10px #5d8b72;
+  transition-delay: 0.5s;
+}
+.toggle-btn.active > .inner-circle {
+  margin-left: 120px;
+}

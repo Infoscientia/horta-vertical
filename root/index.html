@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)https://cdpn.io/vladracoare/fullpage/YzEXveV -->
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.2.0/css/all.css"
+    />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+    <script src="script.js"></script>
+    <title>Cultivar IO</title>
+  </head>
+
+  <body translate="no">
+    <main class="app">
+      <header class="appbar appbar--hero">
+        <div class="appbar__title">
+          <h1 class="appbar__title-text">Cultivar.IO</h1>
+          <p class="appbar__title-text-p">Sistema de Irrigação Autonoma</p>
+        </div>
+        <div class="appbar__controls-right">
+          <button class="button">
+            <i class="fa-solid fa-2x fa-shower"></i>
+            <span class="appbar__controls-right-span">0</span>
+          </button>
+        </div>
+        <div class="status">
+          <i class="fa-solid fa-3x fa-glass-water-droplet"></i>
+          <p class="status-umidade"></p>
+          <p class="status-label">Umidade atual do solo</p>
+        </div>
+      </header>
+      <section class="content backdrop scrollview">
+        <div class="list">
+          <h2 class="list__title">HISTÓRICO</h2>
+          <div class="listagem-historico"></div>
+        </div>
+      </section>
+      <nav class="navigation">
+        <a class="navigation__item">
+          <div class="progress">
+            <div class="toggle-btn" id="unact">
+              <div class="inner-circle"></div>
+            </div>
+            <div class="toggle-btn active" id="act">
+              <div class="inner-circle"></div>
+            </div>
+          </div>
+          <span>Irrigação automática</span>
+        </a>
+        <a class="navigation__item navigation--item-current">
+          <p class="navigation__item-label">
+            Irrigar agora
+            <i class="fa-solid BtnIrrigarManual"></i>
+          </p>
+        </a>
+      </nav>
+    </main>
+  </body>
+</html>
