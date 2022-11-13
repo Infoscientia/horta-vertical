@@ -1,28 +1,31 @@
-#include <Adafruit_NeoPixel.h>
-#include <FirebaseESP8266.h>
 #if defined(ESP32)
 #include <WiFi.h>
+#include <FirebaseESP32.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
+#include <FirebaseESP8266.h>
 #endif
 
-#define WIFI_SSID "POLLY_2.4G" // your wifi SSID
-#define WIFI_PASSWORD "g010203p" //your wifi PASSWORD
 
-#define LedPin 16         // pin d0 as toggle pin
-#define NUM_PIXELS 8      //number of rgb led
-#define PIN_PIXELS 14     //pin d5 as neopixel input
-#define FIREBASE_HOST "toggle-button-3d8-rtdb.firebaseio.com" // change here
-#define FIREBASE_AUTH "icOuLI7Mpe04Nv1ABHfAqyvlQn7HI0aYBwlp"  // your private key
+#define WIFI_SSID "POLLY_2.4G"
+#define WIFI_PASSWORD "g010203p" 
+
+#define Data
+
+#define Pino2 2 
+#define Pino3 3
+#define Pino4 4  
+
+#define IrrigacaoManual 0
+   
+#define FIREBASE_HOST "horta-vertical-96557-default-rtdb.firebaseio.com" 
+#define FIREBASE_AUTH "y7RHHaVjB3XY9Cc8iQoKaanYGEqVCnYSk2PGo3op"  // your private key
 FirebaseData firebaseData;
 
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUM_PIXELS, PIN_PIXELS, NEO_GRB + NEO_KHZ800);
 void setup ()
 {
-  pinMode(LedPin, OUTPUT);
-  pixels.begin();
+  pinMode(Pino2, OUTPUT);
   Serial.begin(9600);
-  // connect to wifi.
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("connecting");
   while (WiFi.status() != WL_CONNECTED) {
@@ -37,27 +40,25 @@ void setup ()
 }
 void loop ()
 {
-  if(Firebase.getString(firebaseData, "/Led1Status"))
+  Data = DateTime.now();
+  if(Firebase.getString(firebaseData, "/irrigarManual"))
   {
-    String ledstatus = firebaseData.stringData();
-    if(ledstatus.toInt() == 1){
-      digitalWrite(LedPin, LOW);
+    String irrigarManual = firebaseData.stringData();
+    if(irrigarManual.toInt() == 1){
+      IrrigacaoManual = 1
+      digitalWrite(Pino2, LOW);
       Serial.println("on");
-      for(int i =0; i<8; i++){
-        pixels.setPixelColor(i, pixels.Color(13, 93, 95));  // #21ecf3 color
-      }
-        pixels.show();
     }
     else {
-      digitalWrite(LedPin, HIGH);
+      IrrigacaoManual = 0
+      digitalWrite(Pino2, HIGH);
       Serial.println("off");
-      for(int i =0; i<8; i++){
-        pixels.setPixelColor(i, pixels.Color(0, 0, 0)); // turn off neopixel
-      }
-        pixels.show();
     }
   }else{
+    Firebase.setString("irrigarManual", IrrigacaoManual);
     Serial.print("Error in getInt, ");
     Serial.println(firebaseData.errorReason());
   } 
+  Serial.println("Data: " + Data);
+  
 }
