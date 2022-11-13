@@ -10,11 +10,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://momentjs.com/downloads/moment.min.js"></script>
-    <script src="script.js"></script>
+    <script src="moment.min.js"></script>
     <title>Cultivar IO</title>
   </head>
-
   <body translate="no">
     <main class="app">
       <header class="appbar appbar--hero">
@@ -41,7 +39,7 @@
         </div>
       </section>
       <nav class="navigation">
-        <a class="navigation__item">
+        <div class="navigation__item">
           <div class="progress">
             <div class="toggle-btn" id="unact">
               <div class="inner-circle"></div>
@@ -51,14 +49,36 @@
             </div>
           </div>
           <span>Irrigação automática</span>
-        </a>
-        <a class="navigation__item navigation--item-current">
+        </div>
+        <div class="navigation__item">
+          <div class="range_container">
+            <div class="sliders_control">
+              <input id="fromSlider" type="range" value="0" min="0" max="100" />
+              <input id="toSlider" type="range" value="100" min="0" max="100" />
+            </div>
+            <div class="form_control">
+              <span>Min: <strong class="min-irrigar"></strong></span>
+              <span>Max: <strong class="max-irrigar"></strong></span>
+              <input
+                type="hidden"
+                id="fromInput"
+                value="10"
+                min="0"
+                max="100"
+              />
+              <input type="hidden" id="toInput" value="30" min="0" max="100" />
+            </div>
+          </div>
+        </div>
+        <div class="navigation__item navigation--item-current">
           <p class="navigation__item-label">
             Irrigar agora
             <i class="fa-solid BtnIrrigarManual"></i>
           </p>
-        </a>
+        </div>
       </nav>
     </main>
   </body>
+  <script src="rangeslider.js"></script>
+  <script src="script.js"></script>
 </html>
