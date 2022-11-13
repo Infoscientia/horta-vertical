@@ -163,6 +163,8 @@ $(document).ready(function () {
       $(".listagem-historico").append(linha);
       qtdLista = Historico.lenght;
 
+      fromSlider.value = Range.min;
+      toSlider.value = Range.max;
       fromInput.value = Range.min;
       toInput.value = Range.max;
       $(".min-irrigar").text(Range.min + "%");
