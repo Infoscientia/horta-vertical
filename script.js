@@ -144,21 +144,21 @@ $(document).ready(function () {
     $(".appbar__controls-right-span").text(Ciclos);
 
     $(".listagem-historico").html("");
-    Historico.forEach((element) => {
+    Object.keys(Historico).forEach((item) => {
       var linha =
         "<a class='list__item'><i class='fa-solid fa-2x fa-shower'></i><div class='list__details'>" +
         "<h2>" +
-        moment(element.data).format("DD/MM/YYYY") +
+        moment(Historico[item]["data"]).format("DD/MM/YYYY") +
         "</h2>" +
         "<p><i class=fa-solid fa-temperature-arrow-down'></i>Inicio " +
-        element.inicio +
+        Historico[item]["inicio"] +
         "% |" +
         "<i class='fa-solid fa-temperature-arrow-up'></i> Termino " +
-        element.termino +
+        Historico[item]["termino"] +
         "% | " +
-        "<i class='fa-solid fa-plug'></i> Tempo " +
-        element.tempo +
-        " min</p></div></a>";
+        "<i class='fa-solid fa-plug'></i> Hora " +
+        Historico[item]["hora"] +
+        " </p></div></a>";
 
       $(".listagem-historico").append(linha);
       qtdLista = Historico.lenght;
@@ -200,8 +200,8 @@ $(document).ready(function () {
 
   $("#fromSlider").change(function () {
     var range = {
-      min: fromInput.value,
-      max: toInput.value,
+      min: Number(fromInput.value),
+      max: Number(toInput.value),
     };
     var firebaseRef = firebase.database().ref().child("range");
     firebaseRef.set(range);
@@ -210,8 +210,8 @@ $(document).ready(function () {
   });
   $("#toSlider").change(function () {
     var range = {
-      min: fromInput.value,
-      max: toInput.value,
+      min: Number(fromInput.value),
+      max: Number(toInput.value),
     };
     var firebaseRef = firebase.database().ref().child("range");
     firebaseRef.set(range);
