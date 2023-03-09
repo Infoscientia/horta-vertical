@@ -23,12 +23,10 @@ struct Date
   int seconds;
 };
 
-char *dayOfWeekNames[] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-
 #define WIFI_SSID "POLLY_2.4G"
-//#define WIFI_SSID "WI-FI"
+// #define WIFI_SSID "WI-FI"
 #define WIFI_PASSWORD "g010203p"
-//#define WIFI_PASSWORD "4dr3n4l1n4"
+// #define WIFI_PASSWORD "4dr3n4l1n4"
 
 NTPClient ntpClient(ntpUDP, "0.br.pool.ntp.org", timeZone * 3600, 60000);
 
@@ -46,15 +44,17 @@ int Ciclos = 0;
 int Minimo = 0;
 int Maximo = 0;
 
-int InicioHorario = 7;
+int InicioHorario = 6;
 int TerminoHorario = 20;
 
-String dataIrrigacao;
+int contador = 0;
+int horaNovaIrrigacao = 7;
+int tempoIrrigacao = 5;
+
 String inicioIrrigacaoUmd;
 String inicioIrrigacaoTempo;
 String terminoIrrigacaoUmd;
 String terminoIrrigacaoTempo;
-String tempoIrrigacao;
 
 String formattedDate;
 String dayStamp;
@@ -64,6 +64,9 @@ int analogSoloSeco = 4000;
 int analogSoloMolhado = 1500;
 int percSoloSeco = 0;
 int percSoloMolhado = 100;
+
+#define FATOR_US_PARA_S 1000000 /* Fator de conversão de micro-segundos para segundos */
+#define TEMPO_DEEP_SLEEP 60
 
 #define FIREBASE_HOST "horta-vertical-96557-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "y7RHHaVjB3XY9Cc8iQoKaanYGEqVCnYSk2PGo3op" // your private key
@@ -140,6 +143,29 @@ Date getDate()
   return date;
 }
 
+void ligaBombaManual()
+{
+  IrrigacaoManual = 1;
+  digitalWrite(PinoBomba, HIGH);
+  digitalWrite(PinoTeste, HIGH);
+  inicioIrrigacaoUmd = UmidadeSensorSolo;
+  inicioIrrigacaoTempo = ntpClient.getFormattedTime();
+  Serial.print("Bomba Ligada:");
+  bombaStatus();
+}
+
+void desligaBombaManual()
+{
+  IrrigacaoManual = 0;
+  digitalWrite(PinoBomba, LOW);
+  digitalWrite(PinoTeste, LOW);
+  terminoIrrigacaoUmd = UmidadeSensorSolo;
+  terminoIrrigacaoTempo = ntpClient.getFormattedTime();
+  Serial.print("Bomba Desligada:");
+  bombaStatus();
+  gravaCiclos();
+}
+
 void getIrrigacaoManual()
 {
   if (Firebase.getString(firebaseData, "/irrigarManual"))
@@ -147,16 +173,19 @@ void getIrrigacaoManual()
     String irrigarManual = firebaseData.stringData();
     if (irrigarManual.toInt() == 1)
     {
-      IrrigacaoManual = 1;
-      digitalWrite(PinoBomba, HIGH);
-      digitalWrite(PinoTeste, HIGH);
-      // gravaHistoricoIrrigacao();
+      if (IrrigacaoManual == 0)
+      {
+        ligaBombaManual();
+      }
+      return;
     }
     else
     {
-      IrrigacaoManual = 0;
-      digitalWrite(PinoBomba, LOW);
-      digitalWrite(PinoTeste, LOW);
+      if (IrrigacaoManual == 1)
+      {
+        desligaBombaManual();
+      }
+      return;
     }
   }
   else
@@ -191,7 +220,6 @@ void getIrrigacaoAtumatica()
 
 void gravaUmidadeAtual()
 {
-  digitalWrite(PinoAtivaSensor, HIGH);
   delay(500);
   if (Firebase.getString(firebaseData, "/umidadeAtual"))
   {
@@ -206,7 +234,6 @@ void gravaUmidadeAtual()
     Serial.print("Error in gravaUmidadeAtual, ");
     Serial.println(firebaseData.errorReason());
   }
-  digitalWrite(PinoAtivaSensor, LOW);
 }
 
 int getRangeMinIrrigacao()
@@ -264,54 +291,98 @@ void consultaSensorUmdSolo(int min, int max, int umidade)
 {
   if (IrrigacaoManual == 0 && umidade > 0 && max > 0)
   {
-    if ((umidade < min) && Irrigando == 0)
+
+    int horaAtual = ntpClient.getHours();
+    if (validaTempoBomba() && horaAtual > horaNovaIrrigacao)
     {
-      Irrigando = 1;
-      digitalWrite(PinoBomba, HIGH);
-      inicioIrrigacaoUmd = umidade;
-      inicioIrrigacaoTempo = ntpClient.getFormattedTime();
-      return;
+      if ((umidade < min) && Irrigando == 0)
+      {
+        Irrigando = 1;
+        digitalWrite(PinoBomba, HIGH);
+        inicioIrrigacaoUmd = umidade;
+        inicioIrrigacaoTempo = ntpClient.getFormattedTime();
+        contador = 1;
+        bombaStatus();
+        return;
+      }
+      if ((umidade > max) && Irrigando == 1)
+      {
+        Irrigando = 0;
+        digitalWrite(PinoBomba, LOW);
+        terminoIrrigacaoUmd = umidade;
+        terminoIrrigacaoTempo = ntpClient.getFormattedTime();
+        gravaCiclos();
+        contador = 0;
+        bombaStatus();
+        return;
+      }
     }
-    if ((umidade > max) && Irrigando == 1)
+  }
+}
+
+boolean validaTempoBomba()
+{
+  gravaContador();
+  if (contador > tempoIrrigacao)
+  {
+    if (Irrigando == 1)
     {
-      Irrigando = 0;
-      digitalWrite(PinoBomba, LOW);
-      terminoIrrigacaoUmd = umidade;
-      terminoIrrigacaoTempo = ntpClient.getFormattedTime();
-      gravaCiclos();
-      return;
+      int horaAtual = ntpClient.getHours();
+      horaNovaIrrigacao = horaAtual + 1;
     }
+    desligaBombaManual();
+    Irrigando = 0;
+    Serial.println("Tempo de bomba Encerrado. ");
+    return false;
+  }
+  Serial.println("Tempo de bomba OK. ");
+  return true;
+}
+
+void gravaContador()
+{
+  if (Irrigando == 1)
+  {
+    contador++;
+  }
+  else
+  {
+    contador = 0;
+  }
+}
+
+void bombaStatus()
+{
+  if (Firebase.getInt(firebaseData, "/bomba"))
+  {
+    int pinStatus = digitalRead(PinoBomba);
+    Firebase.setInt(firebaseData, "bomba", pinStatus);
+  }
+  else
+  {
+    Firebase.setInt(firebaseData, "bomba", 0);
   }
 }
 
 void gravaHistoricoIrrigacao()
 {
-  if (Firebase.getJSON(firebaseData, "/historico"))
-  {
-    FirebaseJson jsonUp;
-    jsonUp.set("data", ntpClient.getFormattedDate());
-    jsonUp.set("hora", ntpClient.getFormattedTime());
-    jsonUp.set("inicio", inicioIrrigacaoUmd);
-    jsonUp.set("termino", terminoIrrigacaoUmd);
-    Firebase.pushJSON(firebaseData, "historico", jsonUp);
-  }
-  else
-  {
-    FirebaseJson jsonUp;
-    jsonUp.set("data", ntpClient.getFormattedDate());
-    jsonUp.set("hora", ntpClient.getFormattedTime());
-    jsonUp.set("inicio", inicioIrrigacaoUmd);
-    jsonUp.set("termino", terminoIrrigacaoUmd);
-    Firebase.setJSON(firebaseData, "historico", jsonUp);
-    Serial.print("Error in HistoricoIrrigacao, ");
-    Serial.println(firebaseData.errorReason());
-  }
+  FirebaseJsonArray jsonUp;
+  jsonUp.add(Ciclos);
+  jsonUp.set("[0]/data", ntpClient.getFormattedDate());
+  jsonUp.set("[0]/hora", ntpClient.getFormattedTime());
+  jsonUp.set("[0]/inicio", inicioIrrigacaoUmd);
+  jsonUp.set("[0]/termino", terminoIrrigacaoUmd);
+  Firebase.pushArray(firebaseData, "historico", jsonUp);
+  Serial.print("Error in HistoricoIrrigacao, ");
+  Serial.println(firebaseData.errorReason());
 }
 
 void loop()
 {
+  digitalWrite(PinoAtivaSensor, HIGH);
   ntpClient.update();
   int horaAtual = ntpClient.getHours();
+  gravaUmidadeAtual();
   if (horaAtual > InicioHorario && horaAtual < TerminoHorario)
   {
     if (Irrigando == 0)
@@ -320,6 +391,12 @@ void loop()
     }
     getIrrigacaoAtumatica();
   }
-  gravaUmidadeAtual();
-  delay(1000);
+
+  // delay(20000);
+  if (Irrigando == 0 && IrrigacaoManual == 0)
+  {
+    digitalWrite(PinoAtivaSensor, LOW);
+    esp_sleep_enable_timer_wakeup(TEMPO_DEEP_SLEEP * FATOR_US_PARA_S);
+    esp_deep_sleep_start();
+  }
 }

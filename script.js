@@ -112,6 +112,7 @@ $(document).ready(function () {
     Ciclos,
     Historico,
     Range,
+    Bomba,
     qtdLista;
 
   qtdLista = 0;
@@ -121,8 +122,17 @@ $(document).ready(function () {
     IrrigarManual = snap.val().irrigarManual;
     UmidadeAtual = snap.val().umidadeAtual;
     Historico = snap.val().historico;
+    Bomba = snap.val().bomba;
     Ciclos = snap.val().ciclos;
     Range = snap.val().range;
+
+    if (Bomba == "1") {
+      document.getElementsByClassName("fa-sun")[0].style.display = "none";
+      document.getElementsByClassName("fa-shower")[0].style.display = "block";
+    } else {
+      document.getElementsByClassName("fa-sun")[0].style.display = "block";
+      document.getElementsByClassName("fa-shower")[0].style.display = "none";
+    }
 
     if (IrrigarAutomatico == "1") {
       document.getElementById("unact").style.display = "none";
@@ -148,16 +158,16 @@ $(document).ready(function () {
       var linha =
         "<a class='list__item'><i class='fa-solid fa-2x fa-shower'></i><div class='list__details'>" +
         "<h2>" +
-        moment(Historico[item]["data"]).format("DD/MM/YYYY") +
+        moment(Historico[item][0]["data"]).format("DD/MM/YYYY") +
         "</h2>" +
         "<p><i class=fa-solid fa-temperature-arrow-down'></i>Inicio " +
-        Historico[item]["inicio"] +
+        Historico[item][0]["inicio"] +
         "% |" +
         "<i class='fa-solid fa-temperature-arrow-up'></i> Termino " +
-        Historico[item]["termino"] +
+        Historico[item][0]["termino"] +
         "% | " +
         "<i class='fa-solid fa-plug'></i> Hora " +
-        Historico[item]["hora"] +
+        Historico[item][0]["hora"] +
         " </p></div></a>";
 
       $(".listagem-historico").append(linha);

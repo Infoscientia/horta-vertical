@@ -76,6 +76,8 @@ body {
 }
 .appbar__controls-right {
   grid-area: controls-right;
+  vertical-align: baseline;
+  text-align: center;
 }
 
 .appbar__controls-right-span {
